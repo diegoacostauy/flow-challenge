@@ -1,30 +1,84 @@
-import {useState} from "react";
+import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+import {api} from "./api";
+import {City, Weather} from "./types";
+
+const CITIES: Record<string, City> = {
+  artigas: {
+    id: "artigas",
+    name: "Artigas",
+    lat: 0,
+    lon: 0,
+  },
+  salto: {
+    id: "salto",
+    name: "Salto",
+    lat: 0,
+    lon: 0,
+  },
+  paysandu: {
+    id: "paysandu",
+    name: "Paysandu",
+    lat: 0,
+    lon: 0,
+  },
+  maldonado: {
+    id: "maldonado",
+    name: "Maldonado",
+    lat: 0,
+    lon: 0,
+  },
+  montevideo: {
+    id: "montevideo",
+    name: "Montevideo",
+    lat: 0,
+    lon: 0,
+  },
+};
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [status, setStatus] = useState<"pending" | "success">("pending");
+  const [weather, setWeather] = useState<Weather | null>(null);
+  const [city, setCity] = useState<City>(Object.values(CITIES)[0]);
+
+  const handleChange = (ev: ChangeEvent<HTMLSelectElement>) => {
+    const city = ev.target.value as keyof typeof CITIES;
+
+    setCity(CITIES[city]);
+  };
+
+  useEffect(() => {
+    api.weather.list(city).then((res) => {
+      setStatus("success");
+      setWeather(res);
+    });
+  }, [city]);
+
+  if (status == "pending") return <p>Loading...</p>;
+
+  if (!weather) return <p>La ciudad no existe o no hay datos del clima.</p>;
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" rel="noreferrer" target="_blank">
-          <img alt="Vite logo" className="logo" src="/vite.svg" />
-        </a>
-        <a href="https://reactjs.org" rel="noreferrer" target="_blank">
-          <img alt="React logo" className="logo react" src={reactLogo} />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </div>
+    <main>
+      <h1>{weather.city.name}</h1>
+      <form action="">
+        <label htmlFor="cities">Ciudad</label>
+        <select id="cities" name="cities" value={city?.id} onChange={handleChange}>
+          {Object.values(CITIES).map((city) => (
+            <option key={city.id} value={city.id}>
+              {city.name}
+            </option>
+          ))}
+        </select>
+      </form>
+      <ul>
+        {weather.forecast.map((forecast, idx) => (
+          <li key={idx}>
+            Min: {forecast.min}, Max: {forecast.max}
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }
 
