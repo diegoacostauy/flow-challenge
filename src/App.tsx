@@ -1,4 +1,4 @@
-import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 
 import {api} from "./api";
 import {City, Weather} from "./types";
@@ -7,39 +7,39 @@ const CITIES: Record<string, City> = {
   artigas: {
     id: "artigas",
     name: "Artigas",
-    lat: 0,
-    lon: 0,
+    lat: -30.58333,
+    lon: -57.0,
   },
   salto: {
     id: "salto",
     name: "Salto",
-    lat: 0,
-    lon: 0,
+    lat: -31.38333,
+    lon: -57.96667,
   },
   paysandu: {
     id: "paysandu",
     name: "Paysandu",
-    lat: 0,
-    lon: 0,
+    lat: -32.32139,
+    lon: -58.07556,
   },
   maldonado: {
     id: "maldonado",
     name: "Maldonado",
-    lat: 0,
-    lon: 0,
+    lat: -34.9,
+    lon: -54.95,
   },
-  montevideo: {
-    id: "montevideo",
-    name: "Montevideo",
-    lat: 0,
-    lon: 0,
+  bariloche: {
+    id: "bariloche",
+    name: "Bariloche",
+    lat: -41.1333,
+    lon: -71.3103,
   },
 };
 
 function App() {
   const [status, setStatus] = useState<"pending" | "success">("pending");
   const [weather, setWeather] = useState<Weather | null>(null);
-  const [city, setCity] = useState<City>(Object.values(CITIES)[0]);
+  const [city, setCity] = useState<City>(Object.values(CITIES)[1]);
 
   const handleChange = (ev: ChangeEvent<HTMLSelectElement>) => {
     const city = ev.target.value as keyof typeof CITIES;
@@ -52,6 +52,8 @@ function App() {
       setStatus("success");
       setWeather(res);
     });
+
+    setStatus("success");
   }, [city]);
 
   if (status == "pending") return <p>Loading...</p>;
@@ -74,7 +76,7 @@ function App() {
       <ul>
         {weather.forecast.map((forecast, idx) => (
           <li key={idx}>
-            Min: {forecast.min}, Max: {forecast.max}
+            {forecast.date} Min: {forecast.min}, Max: {forecast.max}
           </li>
         ))}
       </ul>

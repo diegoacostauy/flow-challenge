@@ -4,6 +4,7 @@ export type Weather = {
     name: string;
   };
   forecast: {
+    date: string;
     min: number;
     max: number;
   }[];
